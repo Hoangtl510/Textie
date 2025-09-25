@@ -1,18 +1,58 @@
 import db from "../../connections/mysql.mjs";
+import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
 
-export const handleSignUp = async () => {
-  const id = "123";
-  const name = "tlh";
-  const phone = "0349510201";
-  const password = "0349510201";
-  const email = "trieulehoang555@gmail.com";
-
+export const signUpModal = async (data) => {
+  const id = uuidv4();
+  const hashedPassword = await bcrypt.hash(data?.password, 10);
   const [result] = await db.query(
     "INSERT INTO users (id, name, phone, password, email) VALUES (?, ?, ?, ?, ?)",
-    [id, name, phone, password, email]
+    [id, data.name, data.phone, hashedPassword, data.email]
   );
   return { id: result.insertId };
 };
-const handleSignIn = () => {};
-const handleRefreshToken = () => {};
+export const signInModal = async (data, id, password) => {
+  // const [rows] = await db.query(
+  //   "SELECT id, password FROM users WHERE id = ? LIMIT 1",
+  //   [id]
+  // );
+  // return rows.length ? rows[0] : null;
+  const checkPassword = await bcrypt.compare(data?.password, password);
+  if (checkPassword) {
+    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || "";
+    const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET || "";
+    const expiresInAccessToken = "1h";
+    const expiresInRefreshToken = "7h";
+    return {
+      access_token: jwt.sign({ id: id.toString() }, accessTokenSecret, {
+        expiresIn: expiresInAccessToken,
+      }),
+      refresh_token: jwt.sign({ id: id.toString() }, refreshTokenSecret, {
+        expiresIn: expiresInRefreshToken,
+      }),
+    };
+  } else {
+    const error = new Error("Invalid password!");
+    error.status = 401;
+    throw error;
+  }
+};
+export const handleRefreshTokenModal = (rfToken) => {
+  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || "";
+  const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET || "";
+  const expiresInAccessToken = "1h";
+  const expiresInRefreshToken = "7h";
+  const payload = jwt.verify(rfToken, refreshTokenSecret);
+
+  return {
+    access_token: jwt.sign({ id: payload?.id }, accessTokenSecret, {
+      expiresIn: expiresInAccessToken,
+    }),
+    refresh_token: jwt.sign({ id: payload?.id }, refreshTokenSecret, {
+      expiresIn: expiresInRefreshToken,
+    }),
+  };
+};
 const handleForgotPassword = () => {};

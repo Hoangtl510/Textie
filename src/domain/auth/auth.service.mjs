@@ -1,34 +1,55 @@
-import { handleSignUp } from "./auth.model.mjs";
-import { checkEmailExits } from "../../utils/checkExits.mjs";
+import {
+  signUpModal,
+  signInModal,
+  handleRefreshTokenModal,
+} from "./auth.model.mjs";
+import { checkEmailExits, checkPhoneExits } from "../../utils/checkExits.mjs";
+import {
+  checkEnoughFields,
+  checkMissingField,
+} from "../../utils/checkField.mjs";
 
-export const singUpService = async (data) => {
-  console.log("data", data);
+export const signUpService = async (data) => {
   const requiredFieldsSignUp = ["name", "phone", "email", "password"];
+  checkEnoughFields(requiredFieldsSignUp);
+  checkMissingField(requiredFieldsSignUp);
 
-  // check thiếu field
-  for (const field of requiredFieldsSignUp) {
-    if (!data[field]) {
-      const error = new Error(`[${requiredFields.join(", ")}] is required!`);
-      error.status = 400;
-      throw error;
-    }
-  }
-
-  //check thừa field
-  const extraFields = Object.keys(data).filter(
-    (key) => !requiredFieldsSignUp.includes(key)
-  );
-
-  if (extraFields.length > 0) {
-    const error = new Error(
-      `Extra fields not allowed: ${extraFields.join(", ")}`
-    );
+  const resCheckEmail = await checkEmailExits(data?.email);
+  const resCheckPhone = await checkPhoneExits(data?.phone);
+  if (resCheckEmail?.id || resCheckPhone?.id) {
+    const error = new Error(`Account already exists!`);
     error.status = 400;
     throw error;
   }
-
-  //   await checkEmailExits("trieulehoang555@gmail.com");
+  await signUpModal(data);
 };
-const singIn = (req, res) => {};
-const refreshToken = (req, res) => {};
+export const signInService = async (data) => {
+  const requiredFieldsSignIn = ["account", "password"];
+
+  checkEnoughFields(requiredFieldsSignIn, data);
+  checkMissingField(requiredFieldsSignIn, data);
+
+  const resCheckEmail = await checkEmailExits(data?.account);
+  const resCheckPhone = await checkPhoneExits(data?.account);
+
+  const passwordSignIn = resCheckEmail?.password ?? resCheckPhone?.password;
+  const idSignIn = resCheckEmail?.id ?? resCheckPhone?.id;
+  if (idSignIn) {
+    const res = await signInModal(data, idSignIn, passwordSignIn);
+    return res;
+  } else {
+    const error = new Error(`Incorrect account!`);
+    error.status = 401;
+    throw error;
+  }
+};
+export const refreshTokenService = (data) => {
+  const requiredFieldsRefreshToken = ["refresh_token"];
+  console.log("data", data);
+
+  // checkEnoughFields(requiredFieldsRefreshToken);
+  // checkMissingField(requiredFieldsRefreshToken);
+  const res = handleRefreshTokenModal(data.refresh_token);
+  console.log("res", res);
+};
 const forgotPassword = (req, res) => {};
