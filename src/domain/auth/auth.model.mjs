@@ -14,11 +14,6 @@ export const signUpModal = async (data) => {
   return { id: result.insertId };
 };
 export const signInModal = async (data, id, password) => {
-  // const [rows] = await db.query(
-  //   "SELECT id, password FROM users WHERE id = ? LIMIT 1",
-  //   [id]
-  // );
-  // return rows.length ? rows[0] : null;
   const checkPassword = await bcrypt.compare(data?.password, password);
   if (checkPassword) {
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || "";
@@ -46,13 +41,19 @@ export const handleRefreshTokenModal = (rfToken) => {
   const expiresInRefreshToken = "7h";
   const payload = jwt.verify(rfToken, refreshTokenSecret);
 
-  return {
-    access_token: jwt.sign({ id: payload?.id }, accessTokenSecret, {
-      expiresIn: expiresInAccessToken,
-    }),
-    refresh_token: jwt.sign({ id: payload?.id }, refreshTokenSecret, {
-      expiresIn: expiresInRefreshToken,
-    }),
-  };
+  if (payload) {
+    return {
+      access_token: jwt.sign({ id: payload?.id }, accessTokenSecret, {
+        expiresIn: expiresInAccessToken,
+      }),
+      refresh_token: jwt.sign({ id: payload?.id }, refreshTokenSecret, {
+        expiresIn: expiresInRefreshToken,
+      }),
+    };
+  } else {
+    const error = new Error("Invalid refresh_token!");
+    error.status = 401;
+    throw error;
+  }
 };
 const handleForgotPassword = () => {};

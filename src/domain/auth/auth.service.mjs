@@ -45,11 +45,13 @@ export const signInService = async (data) => {
 };
 export const refreshTokenService = (data) => {
   const requiredFieldsRefreshToken = ["refresh_token"];
-  console.log("data", data);
-
-  // checkEnoughFields(requiredFieldsRefreshToken);
-  // checkMissingField(requiredFieldsRefreshToken);
+  checkEnoughFields(requiredFieldsRefreshToken, data);
+  checkMissingField(requiredFieldsRefreshToken, data);
   const res = handleRefreshTokenModal(data.refresh_token);
-  console.log("res", res);
+  return res;
 };
-const forgotPassword = (req, res) => {};
+export const forgotPasswordService = (data) => {
+  const requiredFieldsRefreshToken = ["password"];
+  checkEnoughFields(requiredFieldsRefreshToken, data);
+  checkMissingField(requiredFieldsRefreshToken, data);
+};
