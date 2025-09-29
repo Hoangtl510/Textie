@@ -10,8 +10,6 @@ export const signUp = async (req, res) => {
     await signUpService(req.body);
     res.status(200).json({ success: true });
   } catch (err) {
-    console.log("err", err);
-
     res
       .status(err.status ?? 500)
       .json({ error: err.status ?? 500, message: err.message });
