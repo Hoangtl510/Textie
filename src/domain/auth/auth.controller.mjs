@@ -40,13 +40,12 @@ export const refreshToken = async (req, res) => {
   }
 };
 export const forgotPassword = async (req, res) => {
-  try {
-    await forgotPasswordService(req.body);
-
-    res.status(200).json({ success: true });
-  } catch (err) {
-    res
-      .status(err.status ?? 500)
-      .json({ error: err.status ?? 500, message: err.message });
-  }
+  // try {
+  //   await forgotPasswordService(req.body);
+  //   res.status(200).json({ success: true });
+  // } catch (err) {
+  //   res
+  //     .status(err.status ?? 500)
+  //     .json({ error: err.status ?? 500, message: err.message });
+  // }
 };

@@ -56,4 +56,4 @@ export const handleRefreshTokenModal = (rfToken) => {
     throw error;
   }
 };
-export const handleForgotPasswordModal = () => {};
+// export const handleForgotPasswordModal = () => {};

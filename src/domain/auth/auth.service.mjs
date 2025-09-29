@@ -51,8 +51,7 @@ export const refreshTokenService = (data) => {
   return res;
 };
 export const forgotPasswordService = (data) => {
-  const requiredFieldsRefreshToken = ["password"];
-  checkEnoughFields(requiredFieldsRefreshToken, data);
-  checkMissingField(requiredFieldsRefreshToken, data);
-  const res = 
+  // const requiredFieldsRefreshToken = ["password"];
+  // checkEnoughFields(requiredFieldsRefreshToken, data);
+  // checkMissingField(requiredFieldsRefreshToken, data);
 };
