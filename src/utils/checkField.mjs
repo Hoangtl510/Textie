@@ -8,7 +8,7 @@ export const checkEnoughFields = (fields, data) => {
   }
 };
 
-export const checkMissingField = (fields, data) => {
+export const checkRedundantField = (fields, data) => {
   const extraFields = Object.keys(data).filter((key) => !fields.includes(key));
 
   if (extraFields.length > 0) {
